@@ -72,9 +72,14 @@ class ModelLoader:
                     use_fast=False
                 )
                 model = AutoModelForImageClassification.from_pretrained(
-                    metadata.checkpoint_id_or_path
+                    metadata.checkpoint_id_or_path,
+                    low_cpu_mem_usage=False,
+                    attn_implementation="eager"
                 )
-                model.to(settings.DEVICE)
+                try:
+                    model.to(settings.DEVICE)
+                except Exception as to_err:
+                    logger.debug(f"Device placement notice: {to_err}")
                 model.eval()
 
                 container = LoadedModelContainer(
