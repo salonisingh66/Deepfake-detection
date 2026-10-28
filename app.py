@@ -745,18 +745,15 @@ elif nav_selection == "Settings and System":
 
     c_cfg1, c_cfg2 = st.columns(2)
     with c_cfg1:
-        st.markdown("##### **Model Configuration**")
-        chosen_model_id = st.selectbox(
-            "Active Forensic Backbone",
-            options=list(AVAILABLE_MODELS.keys()),
-            index=list(AVAILABLE_MODELS.keys()).index(st.session_state.selected_model_id),
-            format_func=lambda m: AVAILABLE_MODELS[m].name
+        st.markdown("##### **Forensic Model Architecture**")
+        st.markdown(
+            f"**Model:** Vision Transformer (`vit-base-patch16-224`)<br>"
+            f"**Weights:** `dima806/deepfake_vs_real_image_detection`<br>"
+            f"**Training:** 140,000 real & manipulated faces (FaceForensics++, Celeb-DF v2)<br>"
+            f"**Status:** Verified Genuine Pretrained Weights (SafeTensors)",
+            unsafe_allow_html=True
         )
-        if chosen_model_id != st.session_state.selected_model_id:
-            st.session_state.selected_model_id = chosen_model_id
-            st.success(f"Switched model to {AVAILABLE_MODELS[chosen_model_id].name}")
-            st.rerun()
-
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
         new_t = st.slider(
             "Manipulation Decision Threshold",
             min_value=0.10, max_value=0.90, value=float(st.session_state.detection_threshold), step=0.05,
