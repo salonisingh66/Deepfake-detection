@@ -401,19 +401,24 @@ if nav_selection == "Upload":
                 st.markdown(f"**MD5:** <br><code style='font-size:11px;'>{fingerprints['md5']}</code>", unsafe_allow_html=True)
 
             if run_analysis_img:
+                res = None
                 with st.spinner("Analyzing facial features & computing Vision Transformer attention map..."):
-                    res = image_analyzer.analyze_image(
-                        image_bytes=file_bytes,
-                        filename=filename,
-                        model_id=st.session_state.selected_model_id,
-                        threshold=st.session_state.detection_threshold,
-                        generate_explanation=True
-                    )
+                    try:
+                        res = image_analyzer.analyze_image(
+                            image_bytes=file_bytes,
+                            filename=filename,
+                            model_id=st.session_state.selected_model_id,
+                            threshold=st.session_state.detection_threshold,
+                            generate_explanation=True
+                        )
+                    except Exception as err:
+                        st.error(f"❌ Analysis failed: {str(err)}")
+                        logger.error(f"Image analysis error: {err}")
 
                 st.markdown("---")
-                if not res.is_valid:
+                if res and not res.is_valid:
                     st.error(f"❌ **Validation Failed:** {res.error_message}")
-                elif res.status == "NO_FACES_DETECTED":
+                elif res and res.status == "NO_FACES_DETECTED":
                     st.warning(f"⚠️ **Forensic Notice:** {res.error_message}")
                     save_analysis_record(
                         filename=filename, file_type="image", sha256=res.sha256,
@@ -421,7 +426,7 @@ if nav_selection == "Upload":
                         fake_score=0.0, faces_detected=0, execution_time_ms=res.execution_time_ms,
                         status="NO_FACES_DETECTED", metadata_summary=res.metadata
                     )
-                elif res.status == "SUCCESS":
+                elif res and res.status == "SUCCESS":
                     save_analysis_record(
                         filename=filename, file_type="image", sha256=res.sha256,
                         model_name=res.model_name, prediction=res.prediction, confidence_score=res.confidence,
@@ -515,22 +520,28 @@ if nav_selection == "Upload":
                         pbar.progress(frac)
                         status_lbl.text(f"Streaming and analyzing frame {curr}/{total} on CPU...")
 
-                    res_v = video_analyzer.analyze_video(
-                        video_path=temp_video_file,
-                        filename=filename,
-                        model_id=st.session_state.selected_model_id,
-                        sample_interval=v_interval,
-                        max_frames=v_max,
-                        threshold=st.session_state.detection_threshold,
-                        progress_callback=on_vid_progress
-                    )
+                    res_v = None
+                    try:
+                        res_v = video_analyzer.analyze_video(
+                            video_path=temp_video_file,
+                            filename=filename,
+                            model_id=st.session_state.selected_model_id,
+                            sample_interval=v_interval,
+                            max_frames=v_max,
+                            threshold=st.session_state.detection_threshold,
+                            progress_callback=on_vid_progress
+                        )
+                    except Exception as err:
+                        st.error(f"❌ Video analysis failed: {str(err)}")
+                        logger.error(f"Video analysis error: {err}")
+
                     pbar.progress(1.0)
                     status_lbl.empty()
 
                     st.markdown("---")
-                    if not res_v.is_valid:
+                    if res_v and not res_v.is_valid:
                         st.error(f"❌ **Validation Failed:** {res_v.error_message}")
-                    else:
+                    elif res_v and res_v.is_valid:
                         summary = res_v.summary
                         save_analysis_record(
                             filename=filename, file_type="video", sha256=res_v.sha256,
