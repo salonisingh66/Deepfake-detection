@@ -1,7 +1,7 @@
 """DeepShield AI: Deepfake Detection and Forensic Analysis System.
 
-Minimal, modern digital forensics interface for CPU-only deepfake verification.
-Focused on utility, speed, and clean forensic inspection.
+Unified digital forensics interface supporting both image and video media
+with a minimal, high-utility cybersecurity dashboard aesthetic.
 """
 
 from datetime import datetime, timezone
@@ -43,16 +43,16 @@ init_db()
 
 # Page Configuration
 st.set_page_config(
-    page_title="DeepShield AI - Deepfake Detection",
+    page_title="DeepShield AI - Forensics",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Minimal Forensics Theme CSS
+# Premium Cyber-Forensics Dark Theme CSS
 CUSTOM_CSS = """
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Inter', -apple-system, sans-serif;
@@ -63,123 +63,206 @@ CUSTOM_CSS = """
     
     /* Main Background */
     .stApp {
-        background-color: #0b0f19;
+        background-color: #080c14;
         color: #f1f5f9;
     }
     
-    /* Minimal Header */
-    .minimal-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 0px 20px 0px;
-        border-bottom: 1px solid rgba(59, 130, 246, 0.15);
-        margin-bottom: 24px;
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background-color: #0b0f19 !important;
+        border-right: 1px solid rgba(59, 130, 246, 0.12) !important;
     }
-    .minimal-title {
-        font-size: 22px;
-        font-weight: 700;
+    
+    /* Brand Header in Sidebar */
+    .brand-container {
+        padding: 6px 0px 16px 0px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .brand-title {
+        font-size: 20px;
+        font-weight: 800;
         letter-spacing: -0.5px;
-        background: linear-gradient(90deg, #60a5fa 0%, #38bdf8 100%);
+        background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #818cf8 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
-    .minimal-subtitle {
-        color: #94a3b8;
-        font-size: 13px;
+    .brand-tag {
+        font-size: 11px;
+        color: #64748b;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
         margin-top: 2px;
     }
     
-    /* Status Badges */
-    .badge-ready {
-        display: inline-block;
+    /* Pulse Online Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
         padding: 4px 10px;
         border-radius: 9999px;
-        background-color: rgba(16, 185, 129, 0.12);
+        background: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.25);
         color: #10b981;
-        border: 1px solid rgba(16, 185, 129, 0.3);
         font-size: 11px;
         font-weight: 600;
+        margin-top: 8px;
     }
-    .badge-error {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 9999px;
-        background-color: rgba(239, 68, 68, 0.12);
-        color: #ef4444;
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        font-size: 11px;
-        font-weight: 600;
+    .pulse-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background-color: #10b981;
+        margin-right: 7px;
+        box-shadow: 0 0 8px #10b981;
+        animation: pulseAnimation 2s infinite;
+    }
+    @keyframes pulseAnimation {
+        0% { transform: scale(0.95); opacity: 0.8; }
+        50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 12px #10b981; }
+        100% { transform: scale(0.95); opacity: 0.8; }
     }
     
-    /* Verdict Cards */
-    .verdict-box-fake {
-        background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.08) 100%);
+    /* Sidebar Navigation Menu Tiles */
+    div[data-testid="stRadio"] > div[role="radiogroup"] {
+        gap: 6px;
+    }
+    div[data-testid="stRadio"] label {
+        background: rgba(30, 41, 59, 0.35) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 8px !important;
+        padding: 9px 12px !important;
+        margin-bottom: 2px !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    div[data-testid="stRadio"] label:hover {
+        background: rgba(59, 130, 246, 0.12) !important;
+        border-color: rgba(59, 130, 246, 0.35) !important;
+        transform: translateX(2px) !important;
+    }
+    div[data-testid="stRadio"] label:has(input:checked) {
+        background: linear-gradient(90deg, rgba(37, 99, 235, 0.22) 0%, rgba(30, 41, 59, 0.5) 100%) !important;
+        border: 1px solid #3b82f6 !important;
+        border-left: 3.5px solid #38bdf8 !important;
+        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.12) !important;
+    }
+    div[data-testid="stRadio"] input[type="radio"] {
+        display: none !important;
+    }
+    
+    /* Sleek Top Banner */
+    .top-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.45) 0%, rgba(15, 23, 42, 0.6) 100%);
+        border: 1px solid rgba(59, 130, 246, 0.16);
+        border-radius: 12px;
+        margin-bottom: 24px;
+        backdrop-filter: blur(8px);
+    }
+    .top-title {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.4px;
+        color: #f8fafc;
+    }
+    .top-sub {
+        font-size: 13px;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+    
+    /* Unified Upload Dropzone Card */
+    .upload-card {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(11, 15, 25, 0.8) 100%);
+        border: 1.5px dashed rgba(59, 130, 246, 0.35);
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        margin-bottom: 20px;
+        transition: border-color 0.2s ease;
+    }
+    .upload-card:hover {
+        border-color: #38bdf8;
+    }
+    
+    /* Result Verdict Banners */
+    .verdict-fake {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.16) 0%, rgba(185, 28, 28, 0.08) 100%);
         border: 1.5px solid #ef4444;
         border-radius: 10px;
-        padding: 18px;
+        padding: 20px;
         text-align: center;
-        margin-bottom: 18px;
+        margin: 16px 0px;
+        box-shadow: 0 0 25px rgba(239, 68, 68, 0.15);
     }
-    .verdict-box-real {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(4, 120, 87, 0.08) 100%);
+    .verdict-real {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(4, 120, 87, 0.08) 100%);
         border: 1.5px solid #10b981;
         border-radius: 10px;
-        padding: 18px;
+        padding: 20px;
         text-align: center;
-        margin-bottom: 18px;
+        margin: 16px 0px;
+        box-shadow: 0 0 25px rgba(16, 185, 129, 0.15);
     }
-    .verdict-box-inconclusive {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(180, 83, 9, 0.08) 100%);
+    .verdict-inconclusive {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(180, 83, 9, 0.08) 100%);
         border: 1.5px solid #f59e0b;
         border-radius: 10px;
-        padding: 18px;
+        padding: 20px;
         text-align: center;
-        margin-bottom: 18px;
+        margin: 16px 0px;
     }
-    
-    .verdict-label {
-        font-size: 24px;
+    .verdict-head {
+        font-size: 26px;
         font-weight: 800;
         letter-spacing: 0.5px;
     }
-    .verdict-sub {
+    .verdict-meta {
         font-size: 14px;
         color: #cbd5e1;
         margin-top: 4px;
     }
     
-    /* Clean Metric Box */
-    .stat-box {
-        background-color: #1e293b;
-        border: 1px solid #334155;
+    /* Forensic Stat Tiles */
+    .stat-tile {
+        background-color: #111827;
+        border: 1px solid #1f2937;
         border-radius: 8px;
         padding: 12px 14px;
-        margin-bottom: 12px;
+        text-align: center;
     }
-    .stat-box-title {
+    .stat-title {
         font-size: 11px;
         color: #94a3b8;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    .stat-box-val {
+    .stat-val {
         font-size: 20px;
         font-weight: 700;
         color: #f8fafc;
         margin-top: 2px;
     }
     
-    /* Minimal Disclaimer */
-    .minimal-disclaimer {
-        background-color: rgba(15, 23, 42, 0.6);
-        border: 1px solid #334155;
+    /* Subtle Legal Footer */
+    .forensic-disclaimer {
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 8px;
         padding: 10px 14px;
         font-size: 11px;
         color: #64748b;
         line-height: 1.4;
-        margin-top: 28px;
+        margin-top: 32px;
     }
 </style>
 """
@@ -208,30 +291,46 @@ if "detection_threshold" not in st.session_state:
     st.session_state.detection_threshold = CONFIDENCE_THRESHOLD
 
 
-# Minimal Sidebar: Upload, History, Settings and System ONLY
+# Minimal Sidebar
 with st.sidebar:
-    st.markdown("### 🛡️ **DeepShield AI**")
+    st.markdown(
+        """
+        <div class="brand-container">
+            <div class="brand-title">🛡️ DeepShield AI</div>
+            <div class="brand-tag">Deepfake Forensics Lab</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     is_ready, load_err = loader.is_model_ready(st.session_state.selected_model_id)
     if is_ready:
-        st.markdown("<span class='badge-ready'>● Ready (CPU)</span>", unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="status-badge">
+                <span class="pulse-dot"></span> System Ready • CPU
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     else:
-        st.markdown(f"<span class='badge-error'>● Offline: {load_err}</span>", unsafe_allow_html=True)
+        st.markdown(f"<div style='color:#ef4444; font-size:11px;'>● Offline: {load_err}</div>", unsafe_allow_html=True)
     
-    st.markdown("---")
+    st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
     
-    # Strictly Minimal 3-Item Navigation Menu
+    # Minimal 3-Item Menu
     nav_selection = st.radio(
-        "Menu",
+        "Navigation",
         ["Upload", "History", "Settings and System"],
-        index=0
+        index=0,
+        label_visibility="collapsed"
     )
     
     st.markdown("---")
     st.markdown(
-        f"<div style='font-size: 11px; color: #64748b;'>"
+        f"<div style='font-size: 11px; color: #64748b; line-height: 1.6;'>"
         f"<b>Model:</b> {AVAILABLE_MODELS[st.session_state.selected_model_id].name.split()[0]}<br>"
-        f"<b>Target:</b> CPU-only (12GB RAM)<br>"
+        f"<b>Target:</b> 12GB RAM (CPU-Only)<br>"
         f"<b>Version:</b> {settings.VERSION}"
         f"</div>",
         unsafe_allow_html=True
@@ -239,71 +338,73 @@ with st.sidebar:
 
 
 # ==============================================================================
-# MENU 1: UPLOAD (Unified Minimal Interface for Images, Videos, Batch)
+# MENU 1: UPLOAD (ONE UNIFIED UPLOAD FOR BOTH PHOTO & VIDEO)
 # ==============================================================================
 if nav_selection == "Upload":
     st.markdown(
         """
-        <div class="minimal-header">
+        <div class="top-banner">
             <div>
-                <div class="minimal-title">Forensic Detection & Analysis</div>
-                <div class="minimal-subtitle">Upload media to identify facial manipulation, inspect attention regions, and export forensic reports.</div>
+                <div class="top-title">Forensic Detection & Verification</div>
+                <div class="top-sub">Upload an image or video to analyze facial manipulations, view attention regions, and export PDF reports.</div>
             </div>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    upload_tab, video_tab, batch_tab = st.tabs(["📷 Image", "🎬 Video", "📁 Batch Images"])
+    # ONE UNIFIED UPLOADER FOR BOTH PHOTOS AND VIDEOS
+    uploaded_file = st.file_uploader(
+        "Choose an image or video file",
+        type=["jpg", "jpeg", "png", "webp", "mp4", "mov", "avi"],
+        help="Supported formats: JPG, PNG, WEBP, MP4, MOV, AVI. Maximum size: 20MB (Image) / 100MB (Video)",
+        label_visibility="visible"
+    )
 
-    # --------------------------------------------------------------------------
-    # TAB 1: SINGLE IMAGE
-    # --------------------------------------------------------------------------
-    with upload_tab:
-        c_src1, c_src2 = st.columns([3, 1])
-        with c_src1:
-            uploaded_img = st.file_uploader(
-                "Upload Image (JPG, PNG, WEBP)",
-                type=["jpg", "jpeg", "png", "webp"],
-                key="img_uploader",
-                help="Maximum file size: 20MB"
-            )
-        with c_src2:
-            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-            use_sample_img = st.button("🧪 Use Sample Face", use_container_width=True)
+    if not uploaded_file:
+        st.markdown(
+            """
+            <div class="upload-card">
+                <div style="font-size: 32px; margin-bottom: 8px;">📂</div>
+                <div style="font-size: 15px; font-weight: 600; color: #cbd5e1;">Drag and drop any photo or video above</div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                    Supported: JPG, JPEG, PNG, WEBP, MP4, MOV, AVI
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    else:
+        filename = sanitize_filename(uploaded_file.name)
+        ext = Path(filename).suffix.lower()
+        file_bytes = uploaded_file.read()
 
-        img_bytes = None
-        img_filename = "upload.jpg"
+        is_image = ext in settings.ALLOWED_IMAGE_EXTENSIONS
+        is_video = ext in settings.ALLOWED_VIDEO_EXTENSIONS
 
-        if uploaded_img is not None:
-            img_bytes = uploaded_img.read()
-            img_filename = sanitize_filename(uploaded_img.name)
-        elif use_sample_img or st.session_state.get("load_sample_face_state"):
-            sample_p = settings.SAMPLES_DIR / "sample_face_real.jpg"
-            if sample_p.exists():
-                img_bytes = sample_p.read_bytes()
-                img_filename = sample_p.name
-                st.session_state["load_sample_face_state"] = True
+        # ----------------------------------------------------------------------
+        # MEDIA TYPE 1: IMAGE PROCESSING PIPELINE
+        # ----------------------------------------------------------------------
+        if is_image:
+            col_preview, col_provenance = st.columns([1, 1])
+            with col_preview:
+                st.image(file_bytes, caption=f"Target Image: {filename}", use_column_width=True)
+                run_analysis_img = st.button("🚀 Analyze Image", type="primary", use_container_width=True)
 
-        if img_bytes:
-            c_prev, c_meta = st.columns([1, 1])
-            with c_prev:
-                st.image(img_bytes, caption=f"Target: {img_filename}", use_column_width=True)
-                run_img = st.button("🚀 Analyze Image", type="primary", use_container_width=True, key="btn_run_img")
-            
-            with c_meta:
-                fps = compute_file_fingerprints(img_bytes)
+            with col_provenance:
+                fingerprints = compute_file_fingerprints(file_bytes)
                 st.markdown("##### **File Provenance**")
-                st.markdown(f"**Filename:** `{img_filename}`")
-                st.markdown(f"**Size:** `{len(img_bytes):,} bytes`")
-                st.markdown(f"**SHA-256:** <br><code style='font-size:11px;'>{fps['sha256']}</code>", unsafe_allow_html=True)
-                st.markdown(f"**MD5:** <br><code style='font-size:11px;'>{fps['md5']}</code>", unsafe_allow_html=True)
+                st.markdown(f"**Filename:** `{filename}`")
+                st.markdown(f"**Media Type:** `Image ({ext.upper()})`")
+                st.markdown(f"**Size:** `{len(file_bytes):,} bytes`")
+                st.markdown(f"**SHA-256:** <br><code style='font-size:11px;'>{fingerprints['sha256']}</code>", unsafe_allow_html=True)
+                st.markdown(f"**MD5:** <br><code style='font-size:11px;'>{fingerprints['md5']}</code>", unsafe_allow_html=True)
 
-            if run_img:
-                with st.spinner("Analyzing facial characteristics & generating attention map..."):
+            if run_analysis_img:
+                with st.spinner("Analyzing facial features & computing Vision Transformer attention map..."):
                     res = image_analyzer.analyze_image(
-                        image_bytes=img_bytes,
-                        filename=img_filename,
+                        image_bytes=file_bytes,
+                        filename=filename,
                         model_id=st.session_state.selected_model_id,
                         threshold=st.session_state.detection_threshold,
                         generate_explanation=True
@@ -311,51 +412,50 @@ if nav_selection == "Upload":
 
                 st.markdown("---")
                 if not res.is_valid:
-                    st.error(f"❌ **Validation Error:** {res.error_message}")
+                    st.error(f"❌ **Validation Failed:** {res.error_message}")
                 elif res.status == "NO_FACES_DETECTED":
                     st.warning(f"⚠️ **Forensic Notice:** {res.error_message}")
                     save_analysis_record(
-                        filename=img_filename, file_type="image", sha256=res.sha256,
+                        filename=filename, file_type="image", sha256=res.sha256,
                         model_name=res.model_name, prediction="No Face", confidence_score=0.0,
                         fake_score=0.0, faces_detected=0, execution_time_ms=res.execution_time_ms,
                         status="NO_FACES_DETECTED", metadata_summary=res.metadata
                     )
                 elif res.status == "SUCCESS":
                     save_analysis_record(
-                        filename=img_filename, file_type="image", sha256=res.sha256,
+                        filename=filename, file_type="image", sha256=res.sha256,
                         model_name=res.model_name, prediction=res.prediction, confidence_score=res.confidence,
                         fake_score=res.fake_score, faces_detected=res.faces_detected_count,
                         execution_time_ms=res.execution_time_ms, status="SUCCESS", metadata_summary=res.metadata
                     )
 
-                    box_class = "verdict-box-fake" if res.prediction == "Fake" else "verdict-box-real"
-                    color = "#ef4444" if res.prediction == "Fake" else "#10b981"
+                    box_css = "verdict-fake" if res.prediction == "Fake" else "verdict-real"
+                    box_color = "#ef4444" if res.prediction == "Fake" else "#10b981"
                     st.markdown(
                         f"""
-                        <div class="{box_class}">
-                            <div class="verdict-label" style="color: {color};">{res.prediction.upper()}</div>
-                            <div class="verdict-sub">
-                                Model Confidence: <b>{res.confidence*100:.1f}%</b> | 
-                                Manipulated Probability: <b>{res.fake_score*100:.1f}%</b> | 
-                                Latency: <b>{res.execution_time_ms:.1f}ms</b>
+                        <div class="{box_css}">
+                            <div class="verdict-head" style="color: {box_color};">{res.prediction.upper()}</div>
+                            <div class="verdict-meta">
+                                Model Confidence: <b>{res.confidence*100:.1f}%</b> &nbsp;|&nbsp; 
+                                Manipulated Probability: <b>{res.fake_score*100:.1f}%</b> &nbsp;|&nbsp; 
+                                Inference Latency: <b>{res.execution_time_ms:.1f}ms</b>
                             </div>
                         </div>
                         """,
                         unsafe_allow_html=True
                     )
 
-                    # Inspection views
-                    v_col1, v_col2 = st.columns(2)
-                    with v_col1:
+                    c_view1, c_view2 = st.columns(2)
+                    with c_view1:
                         if res.annotated_image_rgb is not None:
                             st.image(res.annotated_image_rgb, caption=f"Localized Faces ({res.faces_detected_count})", use_column_width=True)
-                    with v_col2:
+                    with c_view2:
                         if res.explanation_overlay_rgb is not None:
-                            st.image(res.explanation_overlay_rgb, caption="ViT Attention Map (Sensitivity)", use_column_width=True)
+                            st.image(res.explanation_overlay_rgb, caption="ViT Attention Map (Model Sensitivity)", use_column_width=True)
                         else:
-                            st.info("Visual sensitivity overlays are available for Vision Transformer backbones.")
+                            st.info("Attention overlays are generated for Vision Transformer backbones.")
 
-                    with st.expander("🔍 Detailed Technical & Metadata Observations"):
+                    with st.expander("🔍 Technical & EXIF Observations"):
                         meta_df = pd.DataFrame(
                             [{"Parameter": k, "Value": str(v)} for k, v in res.metadata.items() if k not in ("exif_tags", "forensic_observations")]
                         )
@@ -364,256 +464,174 @@ if nav_selection == "Upload":
                             for obs in res.metadata["forensic_observations"]:
                                 st.write(f"• {obs}")
 
-                    # One-Click PDF Report Download
+                    # One-Click PDF Report Export
                     pdf_data = {
-                        "filename": img_filename, "media_type": "IMAGE", "prediction": res.prediction,
+                        "filename": filename, "media_type": "IMAGE", "prediction": res.prediction,
                         "confidence": res.confidence, "fake_score": res.fake_score, "model_name": res.model_name,
                         "sha256": res.sha256, "md5": res.md5, "size_bytes": res.size_bytes,
                         "metadata_observations": res.metadata.get("forensic_observations", []),
                         "limitations": AVAILABLE_MODELS[res.model_id].known_limitations
                     }
-                    temp_overlay = None
+                    temp_overlay_p = None
                     if res.explanation_overlay_rgb is not None:
-                        temp_overlay = str(settings.TEMP_DIR / f"overlay_{int(time.time())}.jpg")
-                        Image.fromarray(res.explanation_overlay_rgb).save(temp_overlay)
+                        temp_overlay_p = str(settings.TEMP_DIR / f"overlay_{int(time.time())}.jpg")
+                        Image.fromarray(res.explanation_overlay_rgb).save(temp_overlay_p)
 
-                    pdf_bytes = generate_forensic_pdf(pdf_data, explanation_image_path=temp_overlay)
                     st.download_button(
                         label="📄 Download Forensic PDF Report",
-                        data=pdf_bytes,
-                        file_name=f"DeepShield_{img_filename.split('.')[0]}_Report.pdf",
+                        data=generate_forensic_pdf(pdf_data, explanation_image_path=temp_overlay_p),
+                        file_name=f"DeepShield_{filename.split('.')[0]}_Report.pdf",
                         mime="application/pdf",
                         type="primary"
                     )
 
-    # --------------------------------------------------------------------------
-    # TAB 2: VIDEO ANALYSIS
-    # --------------------------------------------------------------------------
-    with video_tab:
-        c_v1, c_v2 = st.columns([3, 1])
-        with c_v1:
-            uploaded_vid = st.file_uploader(
-                "Upload Video File (MP4, MOV, AVI)",
-                type=["mp4", "mov", "avi"],
-                key="vid_uploader",
-                help="Max size: 100MB"
-            )
-        with c_v2:
-            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-            use_sample_vid = st.button("🧪 Use Sample Video", use_container_width=True)
+        # ----------------------------------------------------------------------
+        # MEDIA TYPE 2: VIDEO PROCESSING PIPELINE
+        # ----------------------------------------------------------------------
+        elif is_video:
+            with safe_temp_file(suffix=ext) as temp_video_file:
+                temp_video_file.write_bytes(file_bytes)
+                
+                col_vprev, col_vparams = st.columns([1, 1])
+                with col_vprev:
+                    st.video(str(temp_video_file))
+                    run_analysis_vid = st.button("🚀 Analyze Video Stream", type="primary", use_container_width=True)
 
-        vid_path_actual = None
-        vid_name_disp = "video.mp4"
+                with col_vparams:
+                    st.markdown("##### **Video Sampling Parameters**")
+                    v_interval = st.slider("Sample Interval (Frames)", 5, 45, 15, help="Sample every Nth frame")
+                    v_max = st.slider("Max Frames to Inspect", 10, 60, 25, help="Protects CPU and memory bounds")
+                    
+                    v_fps = compute_file_fingerprints(file_bytes)
+                    st.markdown(f"**Filename:** `{filename}`")
+                    st.markdown(f"**Size:** `{len(file_bytes):,} bytes`")
+                    st.markdown(f"**SHA-256:** <br><code style='font-size:11px;'>{v_fps['sha256']}</code>", unsafe_allow_html=True)
 
-        if uploaded_vid is not None:
-            vid_name_disp = sanitize_filename(uploaded_vid.name)
-            with safe_temp_file(suffix=Path(vid_name_disp).suffix) as tf:
-                tf.write_bytes(uploaded_vid.read())
-                vid_path_actual = tf
-        elif use_sample_vid or st.session_state.get("load_sample_vid_state"):
-            sample_vp = settings.SAMPLES_DIR / "sample_video_with_face.mp4"
-            if sample_vp.exists():
-                vid_path_actual = sample_vp
-                vid_name_disp = sample_vp.name
-                st.session_state["load_sample_vid_state"] = True
+                if run_analysis_vid:
+                    pbar = st.progress(0.0)
+                    status_lbl = st.empty()
 
-        if vid_path_actual and Path(vid_path_actual).exists():
-            st.video(str(vid_path_actual))
-            
-            c_p1, c_p2 = st.columns(2)
-            with c_p1:
-                v_interval = st.slider("Frame Sample Interval", 5, 45, 15, help="Sample every Nth frame")
-            with c_p2:
-                v_max = st.slider("Max Frames", 10, 60, 25, help="Upper bound on sampled frames")
+                    def on_vid_progress(frac, curr, total):
+                        pbar.progress(frac)
+                        status_lbl.text(f"Streaming and analyzing frame {curr}/{total} on CPU...")
 
-            if st.button("🚀 Analyze Video Stream", type="primary", use_container_width=True, key="btn_run_vid"):
-                pbar = st.progress(0.0)
-                status = st.empty()
-
-                def on_video_prog(frac, cur, tot):
-                    pbar.progress(frac)
-                    status.text(f"Processing frame {cur}/{tot} on CPU...")
-
-                res = video_analyzer.analyze_video(
-                    video_path=vid_path_actual,
-                    filename=vid_name_disp,
-                    model_id=st.session_state.selected_model_id,
-                    sample_interval=v_interval,
-                    max_frames=v_max,
-                    threshold=st.session_state.detection_threshold,
-                    progress_callback=on_video_prog
-                )
-                pbar.progress(1.0)
-                status.empty()
-
-                st.markdown("---")
-                if not res.is_valid:
-                    st.error(f"❌ **Validation Failed:** {res.error_message}")
-                else:
-                    summary = res.summary
-                    save_analysis_record(
-                        filename=vid_name_disp, file_type="video", sha256=res.sha256,
-                        model_name=res.model_name, prediction=res.prediction, confidence_score=res.confidence,
-                        fake_score=summary.mean_score if summary else 0.0,
-                        faces_detected=summary.frames_with_faces if summary else 0,
-                        execution_time_ms=res.execution_time_ms, status=res.status, metadata_summary=res.metadata
-                    )
-
-                    v_box = (
-                        "verdict-box-fake" if res.prediction == "Fake"
-                        else "verdict-box-real" if res.prediction == "Real"
-                        else "verdict-box-inconclusive"
-                    )
-                    v_col = "#ef4444" if res.prediction == "Fake" else "#10b981" if res.prediction == "Real" else "#f59e0b"
-
-                    st.markdown(
-                        f"""
-                        <div class="{v_box}">
-                            <div class="verdict-label" style="color: {v_col};">{res.prediction.upper()}</div>
-                            <div class="verdict-sub">
-                                Analyzed: <b>{summary.frames_with_faces}/{summary.frames_sampled} frames</b> | 
-                                Mean Score: <b>{summary.mean_score:.3f}</b> | 
-                                Median: <b>{summary.median_score:.3f}</b> | 
-                                Process Time: <b>{res.execution_time_ms/1000.0:.2f}s</b>
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-
-                    # Quick 4-stat row
-                    m1, m2, m3, m4 = st.columns(4)
-                    with m1:
-                        st.metric("Sampled Frames", f"{summary.frames_sampled}")
-                    with m2:
-                        st.metric("Frames With Faces", f"{summary.frames_with_faces}")
-                    with m3:
-                        st.metric("Score Variation (Std)", f"{summary.score_std:.3f}")
-                    with m4:
-                        st.metric("Fake Frame Ratio", f"{summary.fake_frame_ratio*100:.1f}%")
-
-                    # Timeline Chart
-                    timeline_rows = [
-                        {
-                            "Timestamp (s)": f.timestamp,
-                            "Fake Probability": f.fake_score or 0.0,
-                            "Verdict": f.prediction,
-                            "Face Detected": "Yes" if f.face_detected else "No"
-                        }
-                        for f in res.frame_results
-                    ]
-                    fig_timeline = px.scatter(
-                        pd.DataFrame(timeline_rows),
-                        x="Timestamp (s)",
-                        y="Fake Probability",
-                        color="Verdict",
-                        color_discrete_map={"Fake": "#ef4444", "Real": "#10b981", "No Face": "#64748b"},
-                        title="Temporal Manipulation Distribution"
-                    )
-                    fig_timeline.add_hline(y=st.session_state.detection_threshold, line_dash="dash", line_color="#f59e0b", annotation_text="Threshold")
-                    fig_timeline.update_layout(paper_bgcolor="#0b0f19", plot_bgcolor="#1e293b", font=dict(color="#f1f5f9"))
-                    st.plotly_chart(fig_timeline, use_container_width=True)
-
-                    # Sampled Frame Thumbnails
-                    frames_ready = [f for f in res.frame_results if f.annotated_frame_rgb is not None]
-                    if frames_ready:
-                        st.markdown("##### **Sampled Frame Inspection**")
-                        cols = st.columns(min(4, len(frames_ready)))
-                        for idx, f in enumerate(frames_ready[:8]):
-                            with cols[idx % min(4, len(frames_ready))]:
-                                st.image(f.annotated_frame_rgb, caption=f"t={f.timestamp:.1f}s | {f.prediction}", use_column_width=True)
-
-                    # PDF Export
-                    pdf_v_data = {
-                        "filename": vid_name_disp, "media_type": "VIDEO", "prediction": res.prediction,
-                        "confidence": res.confidence, "fake_score": summary.mean_score, "model_name": res.model_name,
-                        "sha256": res.sha256, "md5": res.md5, "size_bytes": res.size_bytes,
-                        "metadata_observations": [f"Duration: {res.duration_seconds}s, FPS: {res.fps}"] + summary.aggregation_notes,
-                        "video_stats": {
-                            "frames_sampled": summary.frames_sampled, "frames_with_faces": summary.frames_with_faces,
-                            "mean_score": summary.mean_score, "median_score": summary.median_score,
-                            "score_std": summary.score_std, "fake_frame_ratio": summary.fake_frame_ratio
-                        },
-                        "frame_predictions": [
-                            {"frame_index": f.frame_index, "timestamp": f.timestamp, "face_detected": f.face_detected, "prediction": f.prediction, "fake_score": f.fake_score or 0.0}
-                            for f in res.frame_results
-                        ],
-                        "limitations": AVAILABLE_MODELS[res.model_id].known_limitations
-                    }
-                    pdf_v_bytes = generate_forensic_pdf(pdf_v_data)
-                    st.download_button(
-                        label="📄 Download Forensic PDF Report",
-                        data=pdf_v_bytes,
-                        file_name=f"DeepShield_{vid_name_disp.split('.')[0]}_Report.pdf",
-                        mime="application/pdf",
-                        type="primary"
-                    )
-
-    # --------------------------------------------------------------------------
-    # TAB 3: BATCH IMAGES
-    # --------------------------------------------------------------------------
-    with batch_tab:
-        batch_files = st.file_uploader(
-            f"Select Multiple Images (Up to {settings.MAX_BATCH_IMAGE_COUNT})",
-            type=["jpg", "jpeg", "png", "webp"],
-            accept_multiple_files=True,
-            key="batch_uploader"
-        )
-        if batch_files:
-            if len(batch_files) > settings.MAX_BATCH_IMAGE_COUNT:
-                st.warning(f"Batch capped at {settings.MAX_BATCH_IMAGE_COUNT} images to preserve CPU memory.")
-                batch_files = batch_files[:settings.MAX_BATCH_IMAGE_COUNT]
-
-            st.write(f"Selected **{len(batch_files)}** files.")
-            if st.button("🚀 Process Batch", type="primary", key="btn_run_batch"):
-                bpbar = st.progress(0.0)
-                bstatus = st.empty()
-
-                rows = []
-                for idx, bf in enumerate(batch_files):
-                    bstatus.text(f"Processing {bf.name} ({idx+1}/{len(batch_files)})...")
-                    b_bytes = bf.read()
-                    b_name = sanitize_filename(bf.name)
-                    r = image_analyzer.analyze_image(
-                        image_bytes=b_bytes, filename=b_name,
+                    res_v = video_analyzer.analyze_video(
+                        video_path=temp_video_file,
+                        filename=filename,
                         model_id=st.session_state.selected_model_id,
+                        sample_interval=v_interval,
+                        max_frames=v_max,
                         threshold=st.session_state.detection_threshold,
-                        generate_explanation=False
+                        progress_callback=on_vid_progress
                     )
-                    rows.append({
-                        "Filename": b_name,
-                        "Prediction": r.prediction,
-                        "Confidence": f"{r.confidence*100:.1f}%",
-                        "Fake Score": r.fake_score,
-                        "Faces": r.faces_detected_count,
-                        "SHA-256": r.sha256[:12] + "...",
-                        "Time (ms)": r.execution_time_ms
-                    })
-                    if r.is_valid:
+                    pbar.progress(1.0)
+                    status_lbl.empty()
+
+                    st.markdown("---")
+                    if not res_v.is_valid:
+                        st.error(f"❌ **Validation Failed:** {res_v.error_message}")
+                    else:
+                        summary = res_v.summary
                         save_analysis_record(
-                            filename=b_name, file_type="image", sha256=r.sha256,
-                            model_name=r.model_name, prediction=r.prediction,
-                            confidence_score=r.confidence, fake_score=r.fake_score,
-                            faces_detected=r.faces_detected_count,
-                            execution_time_ms=r.execution_time_ms, status=r.status
+                            filename=filename, file_type="video", sha256=res_v.sha256,
+                            model_name=res_v.model_name, prediction=res_v.prediction, confidence_score=res_v.confidence,
+                            fake_score=summary.mean_score if summary else 0.0,
+                            faces_detected=summary.frames_with_faces if summary else 0,
+                            execution_time_ms=res_v.execution_time_ms, status=res_v.status, metadata_summary=res_v.metadata
                         )
-                    bpbar.progress((idx + 1) / len(batch_files))
 
-                bpbar.progress(1.0)
-                bstatus.empty()
+                        v_css = (
+                            "verdict-fake" if res_v.prediction == "Fake"
+                            else "verdict-real" if res_v.prediction == "Real"
+                            else "verdict-inconclusive"
+                        )
+                        v_col = "#ef4444" if res_v.prediction == "Fake" else "#10b981" if res_v.prediction == "Real" else "#f59e0b"
 
-                df_b = pd.DataFrame(rows)
-                st.markdown("##### **Batch Results Summary**")
-                st.dataframe(df_b, use_container_width=True, hide_index=True)
+                        st.markdown(
+                            f"""
+                            <div class="{v_css}">
+                                <div class="verdict-head" style="color: {v_col};">{res_v.prediction.upper()}</div>
+                                <div class="verdict-meta">
+                                    Sampled: <b>{summary.frames_with_faces}/{summary.frames_sampled} frames with faces</b> &nbsp;|&nbsp; 
+                                    Mean Score: <b>{summary.mean_score:.3f}</b> &nbsp;|&nbsp; 
+                                    Median: <b>{summary.median_score:.3f}</b> &nbsp;|&nbsp; 
+                                    Process Time: <b>{res_v.execution_time_ms/1000.0:.2f}s</b>
+                                </div>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
 
-                st.download_button(
-                    "📥 Export Results as CSV",
-                    data=df_b.to_csv(index=False).encode("utf-8"),
-                    file_name="DeepShield_Batch_Results.csv",
-                    mime="text/csv"
-                )
+                        # 4 Stat Tiles
+                        s1, s2, s3, s4 = st.columns(4)
+                        with s1:
+                            st.metric("Sampled Frames", f"{summary.frames_sampled}")
+                        with s2:
+                            st.metric("Frames With Faces", f"{summary.frames_with_faces}")
+                        with s3:
+                            st.metric("Score Variation (Std)", f"{summary.score_std:.3f}")
+                        with s4:
+                            st.metric("Fake Frame Ratio", f"{summary.fake_frame_ratio*100:.1f}%")
 
-    st.markdown(f"<div class='minimal-disclaimer'><b>LEGAL & FORENSIC DISCLAIMER:</b> {MANDATORY_DISCLAIMER}</div>", unsafe_allow_html=True)
+                        # Timeline Chart
+                        st.markdown("##### **Temporal Manipulation Timeline**")
+                        tl_rows = [
+                            {
+                                "Timestamp (s)": f.timestamp,
+                                "Fake Probability": f.fake_score or 0.0,
+                                "Verdict": f.prediction,
+                                "Face Detected": "Yes" if f.face_detected else "No"
+                            }
+                            for f in res_v.frame_results
+                        ]
+                        fig = px.scatter(
+                            pd.DataFrame(tl_rows),
+                            x="Timestamp (s)",
+                            y="Fake Probability",
+                            color="Verdict",
+                            color_discrete_map={"Fake": "#ef4444", "Real": "#10b981", "No Face": "#64748b"}
+                        )
+                        fig.add_hline(y=st.session_state.detection_threshold, line_dash="dash", line_color="#f59e0b", annotation_text="Threshold")
+                        fig.update_layout(paper_bgcolor="#080c14", plot_bgcolor="#111827", font=dict(color="#f1f5f9"), height=300)
+                        st.plotly_chart(fig, use_container_width=True)
+
+                        # Sampled Frame Gallery
+                        f_imgs = [f for f in res_v.frame_results if f.annotated_frame_rgb is not None]
+                        if f_imgs:
+                            st.markdown("##### **Analyzed Frame Crops**")
+                            cols = st.columns(min(4, len(f_imgs)))
+                            for idx, f in enumerate(f_imgs[:8]):
+                                with cols[idx % min(4, len(f_imgs))]:
+                                    st.image(f.annotated_frame_rgb, caption=f"t={f.timestamp:.1f}s | {f.prediction}", use_column_width=True)
+
+                        # PDF Video Report Export
+                        pdf_v_data = {
+                            "filename": filename, "media_type": "VIDEO", "prediction": res_v.prediction,
+                            "confidence": res_v.confidence, "fake_score": summary.mean_score, "model_name": res_v.model_name,
+                            "sha256": res_v.sha256, "md5": res_v.md5, "size_bytes": res_v.size_bytes,
+                            "metadata_observations": [f"Duration: {res_v.duration_seconds}s, FPS: {res_v.fps}"] + summary.aggregation_notes,
+                            "video_stats": {
+                                "frames_sampled": summary.frames_sampled, "frames_with_faces": summary.frames_with_faces,
+                                "mean_score": summary.mean_score, "median_score": summary.median_score,
+                                "score_std": summary.score_std, "fake_frame_ratio": summary.fake_frame_ratio
+                            },
+                            "frame_predictions": [
+                                {"frame_index": f.frame_index, "timestamp": f.timestamp, "face_detected": f.face_detected, "prediction": f.prediction, "fake_score": f.fake_score or 0.0}
+                                for f in res_v.frame_results
+                            ],
+                            "limitations": AVAILABLE_MODELS[res_v.model_id].known_limitations
+                        }
+                        st.download_button(
+                            label="📄 Download Forensic PDF Report",
+                            data=generate_forensic_pdf(pdf_v_data),
+                            file_name=f"DeepShield_{filename.split('.')[0]}_Report.pdf",
+                            mime="application/pdf",
+                            type="primary"
+                        )
+        else:
+            st.error(f"Unsupported file format '{ext}'. Please upload an image (JPG, PNG, WEBP) or video (MP4, MOV, AVI).")
+
+    st.markdown(f"<div class='forensic-disclaimer'><b>LEGAL & FORENSIC DISCLAIMER:</b> {MANDATORY_DISCLAIMER}</div>", unsafe_allow_html=True)
 
 
 # ==============================================================================
@@ -622,10 +640,10 @@ if nav_selection == "Upload":
 elif nav_selection == "History":
     st.markdown(
         """
-        <div class="minimal-header">
+        <div class="top-banner">
             <div>
-                <div class="minimal-title">Forensic Audit Log</div>
-                <div class="minimal-subtitle">Persistent SQLite history of past verifications. Biometric data and raw media are never stored.</div>
+                <div class="top-title">Forensic Audit Log</div>
+                <div class="top-sub">Persistent SQLite history of past verifications. Biometric vectors and media are never retained.</div>
             </div>
         </div>
         """,
@@ -706,7 +724,7 @@ elif nav_selection == "History":
                 st.success(f"Erased {c} records.")
                 st.rerun()
 
-    st.markdown(f"<div class='minimal-disclaimer'><b>LEGAL & FORENSIC DISCLAIMER:</b> {MANDATORY_DISCLAIMER}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='forensic-disclaimer'><b>LEGAL & FORENSIC DISCLAIMER:</b> {MANDATORY_DISCLAIMER}</div>", unsafe_allow_html=True)
 
 
 # ==============================================================================
@@ -715,10 +733,10 @@ elif nav_selection == "History":
 elif nav_selection == "Settings and System":
     st.markdown(
         """
-        <div class="minimal-header">
+        <div class="top-banner">
             <div>
-                <div class="minimal-title">Settings & System Diagnostics</div>
-                <div class="minimal-subtitle">Adjust detection sensitivity, view hardware telemetry, run evaluation benchmarks, and inspect model cards.</div>
+                <div class="top-title">Settings & System Diagnostics</div>
+                <div class="top-sub">Adjust detection sensitivity, view hardware telemetry, run evaluation benchmarks, and inspect model cards.</div>
             </div>
         </div>
         """,
@@ -832,4 +850,4 @@ elif nav_selection == "Settings and System":
             st.markdown(f"- Known Limitations: {'; '.join(mcard.known_limitations)}")
             st.markdown("---")
 
-    st.markdown(f"<div class='minimal-disclaimer'><b>LEGAL & FORENSIC DISCLAIMER:</b> {MANDATORY_DISCLAIMER}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='forensic-disclaimer'><b>LEGAL & FORENSIC DISCLAIMER:</b> {MANDATORY_DISCLAIMER}</div>", unsafe_allow_html=True)
